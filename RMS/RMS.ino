@@ -48,8 +48,6 @@ void setup() {
   while (!Serial) {
     delay(10);
   }
-  delay(1000);
-  Serial.println("ADT7410 demo");
   
   // Make sure the sensor is found, you can also pass in a different i2c
   // address with tempsensor.begin(0x49) for example
@@ -106,9 +104,9 @@ void setup() {
     //    abort();
   }
 
-
+ Serial.println("RTC is NOT initialized, let's set the time!");
   if (! rtc.initialized() || rtc.lostPower()) {
-    Serial.println("RTC is NOT initialized, let's set the time!");
+   
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
   
@@ -185,13 +183,6 @@ void adaLoggerRTC () {
     Serial.print(now.second(), DEC);
     Serial.println();
 
-    Serial.print(" since midnight 1/1/1970 = ");
-    Serial.print(now.unixtime());
-    Serial.print("s = ");
-    Serial.print(now.unixtime() / 86400L);
-    Serial.println("d");
-
-    Serial.println();
     delay(3000);
 }
 
