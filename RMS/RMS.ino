@@ -129,6 +129,13 @@ void setup() {
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   pinMode(LED_BUILTIN, OUTPUT);
 
+  AFMS.begin();  // create with the default frequency 1.6KHz
+
+  myMotor->setSpeed(150);
+  myMotor->run(FORWARD);
+  // turn on motor
+  myMotor->run(RELEASE);
+  
 }
 
 void loop() {
@@ -136,6 +143,7 @@ void loop() {
   builtinLED();
   updateTemperature();
   adaLoggerRTC();
+  
   delay(LOOPDELAY); // To allow time to publish new code.
 }
 
@@ -156,6 +164,15 @@ void updateTemperature() {
   String tempInC = String(c);
   tftDrawText(tempInC, ST77XX_BLUE);
   delay(1000);
+}
+
+void automaticFan(float temperatureThreshold) {
+  float c = tempsensor.readTempC();
+  if(c < temperatureThreshold) {
+    //Motor off
+  } else {
+    //Motor on
+  }
 }
 
 void tftDrawText(String text, uint16_t color) {
