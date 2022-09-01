@@ -104,11 +104,7 @@ void setup() {
     //    abort();
   }
 
- Serial.println("RTC is NOT initialized, let's set the time!");
-  if (! rtc.initialized() || rtc.lostPower()) {
-   
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-  }
+  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   
   rtc.start();
 
