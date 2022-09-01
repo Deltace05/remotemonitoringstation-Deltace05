@@ -14,6 +14,7 @@
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
 #include "Adafruit_miniTFTWing.h"
+#include <Adafruit_MotorShield.h>
 
 //RTC
 #include "RTClib.h"
@@ -37,6 +38,11 @@ char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursd
 boolean LEDOn = false; // State of Built-in LED true=on, false=off.
 #define LOOPDELAY 100
 
+// Create the motor shield object with the default I2C address
+Adafruit_MotorShield AFMS = Adafruit_MotorShield();
+
+// Select which 'port' M1, M2, M3 or M4.
+Adafruit_DCMotor *myMotor = AFMS.getMotor(3);
 
 void setup() {
   Serial.begin(9600);
