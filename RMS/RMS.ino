@@ -130,11 +130,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   AFMS.begin();  // create with the default frequency 1.6KHz
-
-  myMotor->setSpeed(150);
-  myMotor->run(FORWARD);
-  // turn on motor
-  myMotor->run(RELEASE);
+  
   
 }
 
@@ -143,7 +139,7 @@ void loop() {
   builtinLED();
   updateTemperature();
   adaLoggerRTC();
-  
+  automaticFan(20.00);
   delay(LOOPDELAY); // To allow time to publish new code.
 }
 
@@ -168,10 +164,11 @@ void updateTemperature() {
 
 void automaticFan(float temperatureThreshold) {
   float c = tempsensor.readTempC();
+  myMotor->setSpeed(150);
   if(c < temperatureThreshold) {
-    //Motor off
+    myMotor->run(RELEASE);
   } else {
-    //Motor on
+    myMotor->run(FORWARD);
   }
 }
 
