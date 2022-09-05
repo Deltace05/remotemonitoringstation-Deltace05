@@ -1,5 +1,4 @@
 #include "sensitiveInformation.h"
-
 #define FORMAT_SPIFFS_IF_FAILED true
 
 // Wifi & Webserver
@@ -25,9 +24,7 @@ boolean blindsOpen = false;
 
 //RTC
 #include "RTClib.h"
-
 AsyncWebServer server(80);
-
 Adafruit_miniTFTWing ss;
 #define TFT_RST    -1    // we use the seesaw for resetting to save a pin
 #define TFT_CS   14
@@ -38,30 +35,25 @@ Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS,  TFT_DC, TFT_RST);
 // Create the ADT7410 temperature sensor object
 Adafruit_ADT7410 tempsensor = Adafruit_ADT7410();
 
-
 RTC_PCF8523 rtc;
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 boolean LEDOn = false; // State of Built-in LED true=on, false=off.
-#define LOOPDELAY 100
 
+#define LOOPDELAY 100
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-
 // Select which 'port' M1, M2, M3 or M4.
 Adafruit_DCMotor *myMotor = AFMS.getMotor(4);
 
 void setup() {
   Serial.begin(9600);
-
   #ifndef ESP8266
   while (!Serial); // wait for serial port to connect. Needed for native USB
   #endif
-  
   while (!Serial) {
     delay(10);
   }
-  
   // Make sure the sensor is found, you can also pass in a different i2c
   // address with tempsensor.begin(0x49) for example
   if (!tempsensor.begin()) {
