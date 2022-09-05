@@ -167,10 +167,8 @@ void automaticFan(float temperatureThreshold) {
   myMotor->setSpeed(100); 
   if (c < temperatureThreshold) {
     myMotor->run(RELEASE);
-    Serial.println("stop");
-  } else {
+    } else {
     myMotor->run(FORWARD);
-    Serial.println("forward");
   }
 }
 
