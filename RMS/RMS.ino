@@ -42,7 +42,7 @@ boolean LEDOn = false; // State of Built-in LED true=on, false=off.
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 // Select which 'port' M1, M2, M3 or M4.
-Adafruit_DCMotor *myMotor = AFMS.getMotor(3);
+Adafruit_DCMotor *myMotor = AFMS.getMotor(4);
 
 void setup() {
   Serial.begin(9600);
@@ -139,7 +139,7 @@ void loop() {
   builtinLED();
   updateTemperature();
   adaLoggerRTC();
-  automaticFan(20.00);
+  automaticFan(30.00);
   delay(LOOPDELAY); // To allow time to publish new code.
 }
 
