@@ -164,11 +164,13 @@ void updateTemperature() {
 
 void automaticFan(float temperatureThreshold) {
   float c = tempsensor.readTempC();
-  myMotor->setSpeed(150);
-  if(c < temperatureThreshold) {
+  myMotor->setSpeed(100); 
+  if (c < temperatureThreshold) {
     myMotor->run(RELEASE);
+    Serial.println("stop");
   } else {
     myMotor->run(FORWARD);
+    Serial.println("forward");
   }
 }
 
