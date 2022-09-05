@@ -16,6 +16,13 @@
 #include "Adafruit_miniTFTWing.h"
 #include <Adafruit_MotorShield.h>
 
+// ESP32Servo Start
+#include <ESP32Servo.h>
+Servo myservo;  // create servo object to control a servo
+int servoPin = 12;
+boolean blindsOpen = false;
+// ESP32Servo End
+
 //RTC
 #include "RTClib.h"
 
@@ -131,7 +138,14 @@ void setup() {
 
   AFMS.begin();  // create with the default frequency 1.6KHz
   
-  
+  // ESP32Servo Start
+ESP32PWM::allocateTimer(0);
+ESP32PWM::allocateTimer(1);
+ESP32PWM::allocateTimer(2);
+ESP32PWM::allocateTimer(3);
+myservo.setPeriodHertz(50);    // standard 50 hz servo
+myservo.attach(servoPin, 1000, 2000); // attaches the servo on pin 12 to the servo object
+// ESP32Servo End
 }
 
 void loop() {
@@ -140,6 +154,7 @@ void loop() {
   updateTemperature();
   adaLoggerRTC();
   automaticFan(30.00);
+  windowBlinds();
   delay(LOOPDELAY); // To allow time to publish new code.
 }
 
@@ -179,6 +194,18 @@ void tftDrawText(String text, uint16_t color) {
   tft.setTextColor(color);
   tft.setTextWrap(true);
   tft.print(text);
+}
+
+void windowBlinds() {
+  uint32_t buttons = ss.readButtons();
+  if (! (buttons & TFTWING_BUTTON_A)) {
+    if (blindsOpen) {
+      myservo.write(0);
+    } else {
+      myservo.write(180);
+    }
+    blindsOpen = !blindsOpen;
+  }
 }
 
 void adaLoggerRTC () {
