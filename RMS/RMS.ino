@@ -118,9 +118,7 @@ void setup() {
   }
 
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-  
   rtc.start();
-
   float drift = 43; // seconds plus or minus over oservation period - set to 0 to cancel previous calibration.
   float period_sec = (7 * 86400);  // total obsevation period in seconds (86400 = seconds in 1 day:  7 days = (7 * 86400) seconds )
   float deviation_ppm = (drift / period_sec * 1000000); //  deviation in parts per million (μs)
@@ -129,11 +127,10 @@ void setup() {
   int offset = round(deviation_ppm / drift_unit);
   // rtc.calibrate(PCF8523_TwoHours, offset); // Un-comment to perform calibration once drift (seconds) and observation period (seconds) are correct
   // rtc.calibrate(PCF8523_TwoHours, 0); // Un-comment to cancel previous calibration
-
   Serial.print("Offset is "); Serial.println(offset); // Print to control offset
-  
   // The following line can be uncommented if the time needs to be reset.
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  
   pinMode(LED_BUILTIN, OUTPUT);
 
   AFMS.begin();  // create with the default frequency 1.6KHz
