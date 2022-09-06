@@ -141,7 +141,7 @@ void loop() {
 
   builtinLED();
   updateTemperature();
-  adaLoggerRTC();
+  //adaLoggerRTC();
   automaticFan(30.00);
   windowBlinds();
   delay(LOOPDELAY); // To allow time to publish new code.
@@ -158,10 +158,10 @@ void builtinLED() {
 void updateTemperature() {
   // Read and print out the temperature, then convert to *F
   float c = tempsensor.readTempC();
-  Serial.print("Temp: "); Serial.print(c); Serial.print("*C\t"); 
+  //Serial.print("Temp: "); Serial.print(c); Serial.print("*C\t"); 
   String tempInC = String(c);
   tftDrawText(tempInC, ST77XX_BLUE);
-  delay(1000);
+  //delay(1000);
 }
 
 void automaticFan(float temperatureThreshold) {
@@ -188,8 +188,11 @@ void windowBlinds() {
   if (! (buttons & TFTWING_BUTTON_A)) {
     if (blindsOpen) {
       myservo.write(0);
+      Serial.print("button pressed");
+      Ser
     } else {
       myservo.write(180);
+      Serial.print("button pressed");
     }
     blindsOpen = !blindsOpen;
   }
@@ -213,7 +216,7 @@ void adaLoggerRTC () {
     Serial.print(now.second(), DEC);
     Serial.println();
 
-    delay(3000);
+    //delay(3000);
 }
 
 void logEvent(String dataToLog) {
