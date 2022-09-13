@@ -87,20 +87,20 @@ void setup() {
     return;
   }
 
-  // Wifi Configuration
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi..");
-  }
-  Serial.println();
-  Serial.print("Connected to the Internet");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-
-  routesConfiguration(); // Reads routes from routesManagement
-
-  server.begin();
+// Wifi Configuration
+//  WiFi.begin(ssid, password);
+//  while (WiFi.status() != WL_CONNECTED) {
+//    delay(1000);
+//    Serial.println("Connecting to WiFi..");
+//  }
+//  Serial.println();
+//  Serial.print("Connected to the Internet");
+//  Serial.print("IP address: ");
+//  Serial.println(WiFi.localIP());
+//
+//  routesConfiguration(); // Reads routes from routesManagement
+//
+//  server.begin();
 
   // RTC
   if (! rtc.begin()) {
@@ -189,10 +189,11 @@ void windowBlinds() {
     if (blindsOpen) {
       myservo.write(0);
       Serial.print("button pressed");
-      Ser
+      Serial.println();
     } else {
       myservo.write(180);
       Serial.print("button pressed");
+      Serial.println();
     }
     blindsOpen = !blindsOpen;
   }
