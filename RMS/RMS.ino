@@ -46,11 +46,26 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 // Select which 'port' M1, M2, M3 or M4.
 Adafruit_DCMotor *myMotor = AFMS.getMotor(4);
 
+#define LEDRed 27
+#define LEDGreen 33
+// RFID Start
+
+#include <SPI.h>
+#include <MFRC522.h>
+
+#define SS_PIN  21  // ES32 Feather
+#define RST_PIN 17 // esp32 Feather - SCL pin. Could be others.
+
+MFRC522 rfid(SS_PIN, RST_PIN);
+bool safeLocked = true;
+
+// RFID End
+
 void setup() {
   Serial.begin(9600);
-  #ifndef ESP8266
+#ifndef ESP8266
   while (!Serial); // wait for serial port to connect. Needed for native USB
-  #endif
+#endif
   while (!Serial) {
     delay(10);
   }
@@ -60,23 +75,23 @@ void setup() {
     Serial.println("Couldn't find ADT7410!");
     while (1);
   }
-  
+
   if (!ss.begin()) {
     Serial.println("seesaw init error!");
-    while(1);
+    while (1);
   }
   else Serial.println("seesaw started");
 
   ss.tftReset();
   ss.setBacklight(0x0); //set the backlight fully on
-  
+
   // Use this initializer (uncomment) if you're using a 0.96" 180x60 TFT
   tft.initR(INITR_MINI160x80);   // initialize a ST7735S chip, mini display
-  
+
   tft.setRotation(3);
-  
+
   tft.fillScreen(ST77XX_BLACK);
-  
+
   // sensor takes 250 ms to get first readings
   delay(250);
 
@@ -87,20 +102,20 @@ void setup() {
     return;
   }
 
-// Wifi Configuration
-//  WiFi.begin(ssid, password);
-//  while (WiFi.status() != WL_CONNECTED) {
-//    delay(1000);
-//    Serial.println("Connecting to WiFi..");
-//  }
-//  Serial.println();
-//  Serial.print("Connected to the Internet");
-//  Serial.print("IP address: ");
-//  Serial.println(WiFi.localIP());
-//
-//  routesConfiguration(); // Reads routes from routesManagement
-//
-//  server.begin();
+  // Wifi Configuration
+  //  WiFi.begin(ssid, password);
+  //  while (WiFi.status() != WL_CONNECTED) {
+  //    delay(1000);
+  //    Serial.println("Connecting to WiFi..");
+  //  }
+  //  Serial.println();
+  //  Serial.print("Connected to the Internet");
+  //  Serial.print("IP address: ");
+  //  Serial.println(WiFi.localIP());
+  //
+  //  routesConfiguration(); // Reads routes from routesManagement
+  //
+  //  server.begin();
 
   // RTC
   if (! rtc.begin()) {
@@ -109,8 +124,8 @@ void setup() {
     //    abort();
   }
 
-  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   rtc.start();
+  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   float drift = 43; // seconds plus or minus over oservation period - set to 0 to cancel previous calibration.
   float period_sec = (7 * 86400);  // total obsevation period in seconds (86400 = seconds in 1 day:  7 days = (7 * 86400) seconds )
   float deviation_ppm = (drift / period_sec * 1000000); //  deviation in parts per million (μs)
@@ -122,19 +137,29 @@ void setup() {
   Serial.print("Offset is "); Serial.println(offset); // Print to control offset
   // The following line can be uncommented if the time needs to be reset.
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-  
+
   pinMode(LED_BUILTIN, OUTPUT);
 
   AFMS.begin();  // create with the default frequency 1.6KHz
-  
+
   // ESP32Servo Start
-ESP32PWM::allocateTimer(0);
-ESP32PWM::allocateTimer(1);
-ESP32PWM::allocateTimer(2);
-ESP32PWM::allocateTimer(3);
-myservo.setPeriodHertz(50);    // standard 50 hz servo
-myservo.attach(servoPin, 1000, 2000); // attaches the servo on pin 12 to the servo object
-// ESP32Servo End
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  myservo.setPeriodHertz(50);    // standard 50 hz servo
+  myservo.attach(servoPin, 1000, 2000); // attaches the servo on pin 12 to the servo object
+  // ESP32Servo End
+
+  // RFID Start
+  SPI.begin(); // init SPI bus
+  rfid.PCD_Init(); // init MFRC522
+  // RFID End
+  pinMode(LEDRed, OUTPUT);
+  pinMode(LEDGreen, OUTPUT);
+  digitalWrite(LEDRed, LOW);
+  digitalWrite(LEDGreen, LOW);
+
 }
 
 void loop() {
@@ -144,6 +169,8 @@ void loop() {
   //adaLoggerRTC();
   automaticFan(30.00);
   windowBlinds();
+  readRFID();
+  safeStatusDisplay();
   delay(LOOPDELAY); // To allow time to publish new code.
 }
 
@@ -158,7 +185,7 @@ void builtinLED() {
 void updateTemperature() {
   // Read and print out the temperature, then convert to *F
   float c = tempsensor.readTempC();
-  //Serial.print("Temp: "); Serial.print(c); Serial.print("*C\t"); 
+  //Serial.print("Temp: "); Serial.print(c); Serial.print("*C\t");
   String tempInC = String(c);
   tftDrawText(tempInC, ST77XX_BLUE);
   //delay(1000);
@@ -166,10 +193,10 @@ void updateTemperature() {
 
 void automaticFan(float temperatureThreshold) {
   float c = tempsensor.readTempC();
-  myMotor->setSpeed(100); 
+  myMotor->setSpeed(100);
   if (c < temperatureThreshold) {
     myMotor->run(RELEASE);
-    } else {
+  } else {
     myMotor->run(FORWARD);
   }
 }
@@ -199,25 +226,68 @@ void windowBlinds() {
   }
 }
 
+void readRFID() {
+
+  String uidOfCardRead = "";
+  String validCardUID = "76 012 54 73";
+
+  if (rfid.PICC_IsNewCardPresent()) { // new tag is available
+    if (rfid.PICC_ReadCardSerial()) { // NUID has been readed
+      MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
+      for (int i = 0; i < rfid.uid.size; i++) {
+        uidOfCardRead += rfid.uid.uidByte[i] < 0x10 ? " 0" : " ";
+        uidOfCardRead += rfid.uid.uidByte[i];
+      }
+      Serial.println(uidOfCardRead);
+
+      rfid.PICC_HaltA(); // halt PICC
+      rfid.PCD_StopCrypto1(); // stop encryption on PCD
+      uidOfCardRead.trim();
+      if (uidOfCardRead == validCardUID) {
+        safeLocked = false;
+        logEvent("Safe Unlocked");
+      } else {
+        safeLocked = true;
+        logEvent("Safe Locked");
+      }
+    }
+  }
+}
+
+void safeStatusDisplay() {
+  /*
+     Outputs the status of the Safe Lock to the LEDS
+     Red LED = Locked
+     Green LED = Unlocked.
+  */
+  if (safeLocked) {
+    digitalWrite(LEDRed, HIGH);
+    digitalWrite(LEDGreen, LOW);
+  } else {
+    digitalWrite(LEDRed, LOW);
+    digitalWrite(LEDGreen, HIGH);
+  }
+}
+
 void adaLoggerRTC () {
   DateTime now = rtc.now();
 
-    Serial.print(now.year(), DEC);
-    Serial.print('/');
-    Serial.print(now.month(), DEC);
-    Serial.print('/');
-    Serial.print(now.day(), DEC);
-    Serial.print(" (");
-    Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
-    Serial.print(") ");
-    Serial.print(now.hour(), DEC);
-    Serial.print(':');
-    Serial.print(now.minute(), DEC);
-    Serial.print(':');
-    Serial.print(now.second(), DEC);
-    Serial.println();
+  Serial.print(now.year(), DEC);
+  Serial.print('/');
+  Serial.print(now.month(), DEC);
+  Serial.print('/');
+  Serial.print(now.day(), DEC);
+  Serial.print(" (");
+  Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
+  Serial.print(") ");
+  Serial.print(now.hour(), DEC);
+  Serial.print(':');
+  Serial.print(now.minute(), DEC);
+  Serial.print(':');
+  Serial.print(now.second(), DEC);
+  Serial.println();
 
-    //delay(3000);
+  //delay(3000);
 }
 
 void logEvent(String dataToLog) {
