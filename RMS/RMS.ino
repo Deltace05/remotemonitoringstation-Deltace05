@@ -196,8 +196,10 @@ void automaticFan(float temperatureThreshold) {
   myMotor->setSpeed(100);
   if (c < temperatureThreshold) {
     myMotor->run(RELEASE);
+    logEvent("Fan Stopped");
   } else {
     myMotor->run(FORWARD);
+    logEvent("Fan Started");
   }
 }
 
