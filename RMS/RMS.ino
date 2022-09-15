@@ -102,20 +102,18 @@ void setup() {
     return;
   }
 
-  // Wifi Configuration
-  //  WiFi.begin(ssid, password);
-  //  while (WiFi.status() != WL_CONNECTED) {
-  //    delay(1000);
-  //    Serial.println("Connecting to WiFi..");
-  //  }
-  //  Serial.println();
-  //  Serial.print("Connected to the Internet");
-  //  Serial.print("IP address: ");
-  //  Serial.println(WiFi.localIP());
-  //
-  //  routesConfiguration(); // Reads routes from routesManagement
-  //
-  //  server.begin();
+  Wifi Configuration
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi..");
+  }
+  Serial.println();
+  Serial.print("Connected to the Internet");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+  routesConfiguration(); // Reads routes from routesManagement
+  server.begin();
 
   // RTC
   if (! rtc.begin()) {
