@@ -237,7 +237,7 @@ void readRFID() {
         uidOfCardRead += rfid.uid.uidByte[i] < 0x10 ? " 0" : " ";
         uidOfCardRead += rfid.uid.uidByte[i];
       }
-      Serial.println(uidOfCardRead);
+      //Serial.println(uidOfCardRead);
 
       rfid.PICC_HaltA(); // halt PICC
       rfid.PCD_StopCrypto1(); // stop encryption on PCD
