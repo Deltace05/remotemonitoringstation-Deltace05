@@ -102,7 +102,7 @@ void setup() {
     return;
   }
 
-  Wifi Configuration
+  //Wifi Configuration
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
@@ -194,8 +194,7 @@ void automaticFan(float temperatureThreshold) {
   myMotor->setSpeed(100);
   if (c < temperatureThreshold) {
     myMotor->run(RELEASE);
-    logEvent("Fan Stopped");
-  } else {
+    } else {
     myMotor->run(FORWARD);
     logEvent("Fan Started");
   }
