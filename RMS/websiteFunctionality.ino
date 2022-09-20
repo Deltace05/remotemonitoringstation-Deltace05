@@ -60,6 +60,23 @@ void routesConfiguration() {
     request->send(SPIFFS, "/logEvents.csv", "text/html", true);
   });
 
+  server.on("/SafeLock",  HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (!request->authenticate(http_username, http_password))
+      return request->requestAuthentication();
+      safeLocked = true;
+    logEvent("Safe Locked via Website");
+    request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
+  });
+
+  server.on("/SafeUnlock",  HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (!request->authenticate(http_username, http_password))
+      return request->requestAuthentication();
+      safeLocked = false;
+    logEvent("Safe Unlocked via Website");
+    request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
+  });
+
+  
 }
 
 String getDateTime() {
@@ -82,7 +99,7 @@ String processor(const String& var) {
     String datetime = getDateTime();
     return datetime;
   }
- 
+
   if (var == "TEMPERATURE") {
     return String(tempsensor.readTempC());
   }
