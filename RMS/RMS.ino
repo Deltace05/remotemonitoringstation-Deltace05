@@ -106,12 +106,23 @@ void setup() {
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.println("Connecting to WiFi..");
+    tftDrawText("Connecting to WiFi..", ST77XX_RED);
   }
+  tft.fillScreen(ST77XX_BLACK);
+  
   Serial.println();
   Serial.print("Connected to the Internet");
   Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  String ip = WiFi.localIP().toString();
+  Serial.println(ip);
+
+// Display IP on TFT
+  tft.setCursor(0, 60);
+  tft.setTextSize(2);
+  tft.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+  tft.setTextWrap(true);
+  tft.print(ip);
+  
   routesConfiguration(); // Reads routes from routesManagement
   server.begin();
 
@@ -201,10 +212,9 @@ void automaticFan(float temperatureThreshold) {
 }
 
 void tftDrawText(String text, uint16_t color) {
-  tft.fillScreen(ST77XX_BLACK);
   tft.setCursor(0, 0);
   tft.setTextSize(3);
-  tft.setTextColor(color);
+  tft.setTextColor(color, ST77XX_BLACK);
   tft.setTextWrap(true);
   tft.print(text);
 }
