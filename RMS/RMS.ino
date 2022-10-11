@@ -109,7 +109,7 @@ void setup() {
     tftDrawText("Connecting to WiFi..", ST77XX_RED);
   }
   tft.fillScreen(ST77XX_BLACK);
-  
+
   Serial.println();
   Serial.print("Connected to the Internet");
   Serial.print("IP address: ");
@@ -183,6 +183,7 @@ void loop() {
   delay(LOOPDELAY); // To allow time to publish new code.
 }
 
+//built in LED function, allows for the LED on the ESP32 board to be turned on and off by the website
 void builtinLED() {
   if (LEDOn) {
     digitalWrite(LED_BUILTIN, HIGH);
@@ -191,6 +192,7 @@ void builtinLED() {
   }
 }
 
+//Takes temperature from ADT7410 temperature sensor and outputs it as a string
 void updateTemperature() {
   // Read and print out the temperature, then convert to *F
   float c = tempsensor.readTempC();
@@ -200,6 +202,7 @@ void updateTemperature() {
   //delay(1000);
 }
 
+//Checks temperature from temperature variable and if temperature passes a certain threshold will turn on the DC motor (fan)
 void automaticFan(float temperatureThreshold) {
   float c = tempsensor.readTempC();
   myMotor->setSpeed(100);
@@ -211,6 +214,7 @@ void automaticFan(float temperatureThreshold) {
   }
 }
 
+//Prints current temperature to the top of the TFT screen live.
 void tftDrawText(String text, uint16_t color) {
   tft.setCursor(0, 0);
   tft.setTextSize(3);
@@ -219,6 +223,7 @@ void tftDrawText(String text, uint16_t color) {
   tft.print(text);
 }
 
+//If the A button on the TFT wing is pressed, will rotate a servo from 0 to 180 degrees and back, simulates opening a blind
 void windowBlinds() {
   uint32_t buttons = ss.readButtons();
   if (! (buttons & TFTWING_BUTTON_A)) {
@@ -235,6 +240,8 @@ void windowBlinds() {
   }
 }
 
+
+//Reads the ID of the tag presented to the scanner, and if it is the correct ID number, will unlock the safe, if the tag is incorrect, will lock the safe
 void readRFID() {
 
   String uidOfCardRead = "";
@@ -263,6 +270,9 @@ void readRFID() {
   }
 }
 
+//if the red LED is on, safe is locked
+//if green LED is on, the safe is unlocked
+//This serves to show if the safe is unlocked as without it it is impossible to tell what state the safe is in.
 void safeStatusDisplay() {
   /*
      Outputs the status of the Safe Lock to the LEDS
@@ -278,6 +288,7 @@ void safeStatusDisplay() {
   }
 }
 
+//not in use, simply prints date and time to serial monitor.
 void adaLoggerRTC () {
   DateTime now = rtc.now();
 
@@ -299,6 +310,7 @@ void adaLoggerRTC () {
   //delay(3000);
 }
 
+//If function is called, will log the data inside the brackets to the SPIFFS partition
 void logEvent(String dataToLog) {
   /*
      Log entries to a file stored in SPIFFS partition on the ESP32.
