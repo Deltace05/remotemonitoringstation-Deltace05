@@ -58,6 +58,10 @@ Adafruit_DCMotor *myMotor = AFMS.getMotor(4);
 
 MFRC522 rfid(SS_PIN, RST_PIN);
 bool safeLocked = true;
+int ledState = LOW;             // ledState used to set the LED
+unsigned long previousMillis = 0;        // will store last time LED was updated
+const long interval = 10000;           // interval at which to blink (milliseconds)
+
 
 // RFID End
 
@@ -116,13 +120,13 @@ void setup() {
   String ip = WiFi.localIP().toString();
   Serial.println(ip);
 
-// Display IP on TFT
+  // Display IP on TFT
   tft.setCursor(0, 60);
   tft.setTextSize(2);
   tft.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   tft.setTextWrap(true);
   tft.print(ip);
-  
+
   routesConfiguration(); // Reads routes from routesManagement
   server.begin();
 
@@ -208,7 +212,7 @@ void automaticFan(float temperatureThreshold) {
   myMotor->setSpeed(100);
   if (c < temperatureThreshold) {
     myMotor->run(RELEASE);
-    } else {
+  } else {
     myMotor->run(FORWARD);
     logEvent("Fan Started");
   }
@@ -229,12 +233,10 @@ void windowBlinds() {
   if (! (buttons & TFTWING_BUTTON_A)) {
     if (blindsOpen) {
       myservo.write(0);
-      Serial.print("button pressed");
-      Serial.println();
+      logEvent("Blinds Activated");
     } else {
       myservo.write(180);
-      Serial.print("button pressed");
-      Serial.println();
+      logEvent("Blinds Activated");
     }
     blindsOpen = !blindsOpen;
   }
@@ -285,6 +287,14 @@ void safeStatusDisplay() {
   } else {
     digitalWrite(LEDRed, LOW);
     digitalWrite(LEDGreen, HIGH);
+    unsigned long currentMillis = millis();
+
+    if (currentMillis - previousMillis >= interval) {
+      // save the last time you blinked the LED
+      previousMillis = currentMillis;
+
+      safeLocked = true;
+    }
   }
 }
 
