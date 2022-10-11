@@ -294,6 +294,7 @@ void safeStatusDisplay() {
       previousMillis = currentMillis;
 
       safeLocked = true;
+      logEvent("Safe Locked");
     }
   }
 }
