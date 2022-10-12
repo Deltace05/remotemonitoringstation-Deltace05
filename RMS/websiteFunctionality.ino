@@ -63,7 +63,7 @@ void routesConfiguration() {
   server.on("/SafeLock",  HTTP_GET, [](AsyncWebServerRequest * request) {
     if (!request->authenticate(http_username, http_password))
       return request->requestAuthentication();
-      safeLocked = true;
+    safeLocked = true;
     logEvent("Safe Locked via Website");
     request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
   });
@@ -71,12 +71,37 @@ void routesConfiguration() {
   server.on("/SafeUnlock",  HTTP_GET, [](AsyncWebServerRequest * request) {
     if (!request->authenticate(http_username, http_password))
       return request->requestAuthentication();
-      safeLocked = false;
+    safeLocked = false;
     logEvent("Safe Unlocked via Website");
     request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
   });
 
-  
+  server.on("/FanManualOn",  HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (!request->authenticate(http_username, http_password))
+      return request->requestAuthentication();
+    fanEnabled = true;
+    logEvent("Fan Manual Control: On");
+    request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
+  });
+
+
+  server.on("/FanManualOff",  HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (!request->authenticate(http_username, http_password))
+      return request->requestAuthentication();
+    fanEnabled = false;
+    logEvent("Fan Manual Control: Off");
+    request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
+  });
+
+  server.on("/FanControl",  HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (!request->authenticate(http_username, http_password))
+      return request->requestAuthentication();
+    automaticFanControl = !automaticFanControl;
+    logEvent("Fan Manual Control: On");
+    request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
+  });
+
+
 }
 
 String getDateTime() {
