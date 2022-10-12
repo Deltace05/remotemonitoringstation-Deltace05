@@ -46,6 +46,9 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 // Select which 'port' M1, M2, M3 or M4.
 Adafruit_DCMotor *myMotor = AFMS.getMotor(4);
 
+bool fanEnabled = false;            // If the fan is on or off.
+bool automaticFanControl = true;    // Automatic or manual control
+
 #define LEDRed 27
 #define LEDGreen 33
 // RFID Start
@@ -179,6 +182,7 @@ void loop() {
 
   builtinLED();
   updateTemperature();
+  fanControl();
   //adaLoggerRTC();
   automaticFan(30.00);
   windowBlinds();
@@ -211,10 +215,21 @@ void automaticFan(float temperatureThreshold) {
   float c = tempsensor.readTempC();
   myMotor->setSpeed(100);
   if (c < temperatureThreshold) {
-    myMotor->run(RELEASE);
+    fanEnabled = false;
   } else {
-    myMotor->run(FORWARD);
+    fanEnabled = true;
     logEvent("Fan Started");
+  }
+}
+
+void fanControl() {
+  if (automaticFanControl) {
+    automaticFan(30.0);
+  }
+  if (fanEnabled) {
+    myMotor->run(FORWARD);
+  } else {
+    myMotor->run(RELEASE);
   }
 }
 
@@ -280,6 +295,7 @@ void safeStatusDisplay() {
      Outputs the status of the Safe Lock to the LEDS
      Red LED = Locked
      Green LED = Unlocked.
+     Bug/Issue: timer does not count when activated, timer constantly counts and resets, time where safe is unlocked can vary.
   */
   if (safeLocked) {
     digitalWrite(LEDRed, HIGH);
