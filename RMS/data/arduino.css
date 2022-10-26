@@ -2,7 +2,7 @@
     display: grid;
     grid-template-columns: auto auto;
     grid-gap: 10px;
-    background-color: #2c698d;
+    background-color: #98A8F8;
     padding: 10px;
 }
 
@@ -23,12 +23,12 @@
 }
 
 body {
-    background-color: lightcyan;
+    background-color: #BCCEF8;
     /*color: blue;*/
 }
 
 h1 {
-    background-color: green;
+    background-color: #535f9b;
     color: white;
     text-align: center;
 }
@@ -57,9 +57,9 @@ li a {
 
 /* Change the link color to #111 (black) on hover */
 li a:hover {
-    background-color: #111;
+    background-color: rgb(0, 174, 255);
 }
 
 .active {
-    background-color: #04AA6D;
+    background-color: #001aff;
 }
