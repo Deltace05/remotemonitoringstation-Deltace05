@@ -109,7 +109,15 @@ void routesConfiguration() {
     request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
   });
 
-
+server.on("/admin.html", HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (!request->authenticate(usernameAdmin, passwordAdmin)){
+      logEvent("Administrator Access Attempt failed");
+      return request->requestAuthentication();
+    }
+    logEvent("Admin access");
+    request->send(SPIFFS, "/admin.html", "text/html", false, processor);
+  });
+  
 }
 
 String getDateTime() {
