@@ -62,7 +62,7 @@ void routesConfiguration() {
 
   // Example of route which sets file to download - 'true' in send() command.
   server.on("/logOutput", HTTP_GET, [](AsyncWebServerRequest * request) {
-    if (!request->authenticate(usernameGuest, passwordGuest))
+    if (!request->authenticate(usernameAdmin, passwordAdmin))
       return request->requestAuthentication();
     logEvent("Log Event Download");
     request->send(SPIFFS, "/logEvents.csv", "text/html", true);
