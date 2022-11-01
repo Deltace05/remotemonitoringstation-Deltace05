@@ -84,6 +84,22 @@ void routesConfiguration() {
     request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
   });
 
+    server.on("/SafeLockAdmin",  HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (!request->authenticate(usernameAdmin, passwordAdmin))
+      return request->requestAuthentication();
+    safeLocked = true;
+    logEvent("Safe Locked via Website");
+    request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
+  });
+
+  server.on("/SafeUnlockAdmin",  HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (!request->authenticate(usernameAdmin, passwordAdmin))
+      return request->requestAuthentication();
+    safeLocked = false;
+    logEvent("Safe Unlocked via Website");
+    request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
+  });
+
   server.on("/FanManualOn",  HTTP_GET, [](AsyncWebServerRequest * request) {
     if (!request->authenticate(usernameGuest, passwordGuest))
       return request->requestAuthentication();
