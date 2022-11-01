@@ -14,7 +14,7 @@
 #include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
 #include "Adafruit_miniTFTWing.h"
 #include <Adafruit_MotorShield.h>
-
+float fanTemperatureThreshold = 30.0;
 // ESP32Servo Start
 #include <ESP32Servo.h>
 Servo myservo;  // create servo object to control a servo
@@ -224,7 +224,7 @@ void automaticFan(float temperatureThreshold) {
 
 void fanControl() {
   if (automaticFanControl) {
-    automaticFan(30.0);
+    automaticFan(fanTemperatureThreshold);
   }
   if (fanEnabled) {
     myMotor->run(FORWARD);
