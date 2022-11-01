@@ -1,3 +1,5 @@
+const char* PARAM_INPUT_1 = "tempThreshold";
+
 void routesConfiguration() {
 
   server.onNotFound([](AsyncWebServerRequest * request) {
@@ -84,7 +86,7 @@ void routesConfiguration() {
     request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
   });
 
-    server.on("/SafeLockAdmin",  HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/SafeLockAdmin",  HTTP_GET, [](AsyncWebServerRequest * request) {
     if (!request->authenticate(usernameAdmin, passwordAdmin))
       return request->requestAuthentication();
     safeLocked = true;
@@ -125,15 +127,25 @@ void routesConfiguration() {
     request->send(SPIFFS, "/dashboard.html", "text/html", false, processor);
   });
 
-server.on("/admin.html", HTTP_GET, [](AsyncWebServerRequest * request) {
-    if (!request->authenticate(usernameAdmin, passwordAdmin)){
+  server.on("/admin.html", HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (!request->authenticate(usernameAdmin, passwordAdmin)) {
       logEvent("Administrator Access Attempt failed");
       return request->requestAuthentication();
     }
     logEvent("Admin access");
     request->send(SPIFFS, "/admin.html", "text/html", false, processor);
   });
-  
+
+
+  server.on("/setTemperatureThreshold", HTTP_GET,  [](AsyncWebServerRequest * request) {
+    int newThreshold;
+    if (request->hasParam(PARAM_INPUT_1)) {
+      fanTemperatureThreshold = request->getParam(PARAM_INPUT_1)->value().toFloat();
+      String logMessage = "Administrator set Automatic Fan Theshold to" + String(fanTemperatureThreshold);
+      logEvent(logMessage);
+    }
+    request->send(SPIFFS, "/admin.html", "text/html", false, processor);
+  });
 }
 
 String getDateTime() {
@@ -160,7 +172,10 @@ String processor(const String& var) {
   if (var == "TEMPERATURE") {
     return String(tempsensor.readTempC());
   }
-
+  
+  if (var == "CURRENTTHRESHOLD") {
+    return String(fanTemperatureThreshold);
+  }
   // Default "catch" which will return nothing in case the HTML has no variable to replace.
   return String();
 }
